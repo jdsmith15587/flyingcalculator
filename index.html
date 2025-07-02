@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flying vs S&P 500 Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #32495f;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .results {
+            background: #f8f9fa;
+            padding: 40px;
+            border-top: 1px solid #e0e0e0;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .result-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .flying-cost {
+            color: #ff6b6b;
+        }
+
+        .investment-value {
+            color: #4caf50;
+        }
+
+        .opportunity-cost {
+            color: #ff9800;
+        }
+
+        .result-subtitle {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .summary h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .summary p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .disclaimer {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 10px;
+            border-left: 4px solid #ffa726;
+        }
+
+        .disclaimer p {
+            color: #856404;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .plane-emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="plane-emoji">✈️</span>Flying vs S&P 500 Calculator</h1>
+            <p>Discover how much your flying hobby could have earned in the stock market</p>
+        </div>
+
+        <div class="form-section">
+            <div class="input-group">
+                <label for="totalHours">Total Flight Hours</label>
+                <input type="number" id="totalHours" placeholder="e.g., 250">
+            </div>
+
+            <div class="input-group">
+                <label for="costPerHour">Average Cost Per Flight Hour ($)</label>
+                <input type="number" id="costPerHour" placeholder="e.g., 150">
+            </div>
+
+            <div class="input-group">
+                <label for="startYear">Year Started Flying</label>
+                <input type="number" id="startYear" placeholder="e.g., 2015" min="1950" max="2025">
+            </div>
+
+            <div class="input-group">
+                <label for="endYear">Year Ended Flying (or current year)</label>
+                <input type="number" id="endYear" placeholder="e.g., 2024" min="1950" max="2025">
+            </div>
+
+            <div class="input-group">
+                <label for="hoursPerYear">Average Flight Hours Per Year</label>
+                <input type="number" id="hoursPerYear" placeholder="Auto-calculated" readonly>
+                <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                    This will be calculated automatically based on your total hours and time period
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculateResults()">
+                Calculate My Opportunity Cost 💸
+            </button>
+        </div>
+
+        <div class="results" id="results">
+            <div class="result-card">
+                <div class="result-title">Total Money Spent on Flying</div>
+                <div class="result-value flying-cost" id="totalSpent">$0</div>
+                <div class="result-subtitle">Your total investment in aviation</div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-title">If Invested in S&P 500 Instead</div>
+                <div class="result-value investment-value" id="spValue">$0</div>
+                <div class="result-subtitle">Based on historical S&P 500 returns</div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-title">Opportunity Cost</div>
+                <div class="result-value opportunity-cost" id="opportunityCost">$0</div>
+                <div class="result-subtitle">Money you could have made instead</div>
+            </div>
+
+            <div class="summary">
+                <h3>The Verdict</h3>
+                <p id="summaryText">Your flying adventure awaits calculation...</p>
+            </div>
+
+            <div class="disclaimer">
+                <p><strong>Disclaimer:</strong> This is a fun calculator for entertainment purposes. It uses approximate S&P 500 historical returns (about 10% annually) and assumes dollar-cost averaging. Past performance doesn't guarantee future returns. Also, you can't put a price on the joy of flying! ✈️</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Approximate S&P 500 annual returns (simplified for this calculator)
+        const sp500Returns = {
+            2024: 0.24, 2023: 0.24, 2022: -0.19, 2021: 0.27, 2020: 0.16,
+            2019: 0.29, 2018: -0.06, 2017: 0.19, 2016: 0.09, 2015: -0.01,
+            2014: 0.11, 2013: 0.30, 2012: 0.13, 2011: 0.00, 2010: 0.13,
+            2009: 0.23, 2008: -0.38, 2007: 0.03, 2006: 0.13, 2005: 0.03,
+            2004: 0.09, 2003: 0.26, 2002: -0.23, 2001: -0.13, 2000: -0.10,
+            1999: 0.20, 1998: 0.27, 1997: 0.31, 1996: 0.20, 1995: 0.34,
+            1994: -0.01, 1993: 0.07, 1992: 0.04, 1991: 0.26, 1990: -0.06,
+            1989: 0.27, 1988: 0.12, 1987: 0.02, 1986: 0.14, 1985: 0.26,
+            1984: 0.01, 1983: 0.17, 1982: 0.15, 1981: -0.09, 1980: 0.26,
+            1979: 0.12, 1978: 0.01, 1977: -0.11, 1976: 0.19, 1975: 0.31,
+            1974: -0.29, 1973: -0.17, 1972: 0.16, 1971: 0.11, 1970: 0.01
+        };
+
+        function calculateResults() {
+            // Get input values
+            const totalHours = parseFloat(document.getElementById('totalHours').value);
+            const costPerHour = parseFloat(document.getElementById('costPerHour').value);
+            const startYear = parseInt(document.getElementById('startYear').value);
+            const endYear = parseInt(document.getElementById('endYear').value);
+
+            // Validate inputs
+            if (!totalHours || !costPerHour || !startYear || !endYear) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (startYear >= endYear) {
+                alert('End year must be after start year');
+                return;
+            }
+
+            if (totalHours <= 0 || costPerHour <= 0) {
+                alert('Please enter positive numbers for hours and costs');
+                return;
+            }
+
+            // Calculate average hours per year automatically
+            const yearSpan = endYear - startYear;
+            const hoursPerYear = totalHours / yearSpan;
+
+            // Update the display field to show calculated value
+            document.getElementById('hoursPerYear').value = hoursPerYear.toFixed(1);
+
+            // Calculate total money spent
+            const totalSpent = totalHours * costPerHour;
+
+            // Calculate annual investment amounts
+            const annualSpending = totalSpent / yearSpan;
+
+            // Calculate S&P 500 investment value using proper dollar-cost averaging
+            let totalInvestmentValue = 0;
+
+            for (let year = startYear; year < endYear; year++) {
+                // Amount invested this year
+                const yearlyInvestment = annualSpending;
+                let investmentValue = yearlyInvestment;
+                
+                // Compound this year's investment through all subsequent years
+                for (let growthYear = year + 1; growthYear <= endYear; growthYear++) {
+                    const returnRate = sp500Returns[growthYear] || 0.10; // Default to 10% if no data
+                    investmentValue *= (1 + returnRate);
+                }
+                
+                // Add this year's final value to the total
+                totalInvestmentValue += investmentValue;
+            }
+
+            const investmentValue = totalInvestmentValue;
+            const opportunityCost = investmentValue - totalSpent;
+
+            // Update display
+            document.getElementById('totalSpent').textContent = formatCurrency(totalSpent);
+            document.getElementById('spValue').textContent = formatCurrency(investmentValue);
+            document.getElementById('opportunityCost').textContent = formatCurrency(opportunityCost);
+
+            // Generate summary text
+            let summaryText;
+            if (opportunityCost > 0) {
+                const multiple = (investmentValue / totalSpent).toFixed(1);
+                summaryText = `Ouch! You could have had ${multiple}x your money if you'd invested in the S&P 500 instead of flying. But hey, you can't put a price on those amazing views and the freedom of flight! 🌅`;
+            } else {
+                summaryText = `Good news! Your flying timing was actually pretty good from an investment perspective. You didn't miss out on much market growth during those years. Keep flying! 🛩️`;
+            }
+
+            document.getElementById('summaryText').textContent = summaryText;
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Auto-calculate hours per year when inputs change
+        function updateHoursPerYear() {
+            const totalHours = parseFloat(document.getElementById('totalHours').value);
+            const startYear = parseInt(document.getElementById('startYear').value);
+            const endYear = parseInt(document.getElementById('endYear').value);
+            
+            if (totalHours && startYear && endYear && endYear > startYear) {
+                const yearSpan = endYear - startYear;
+                const hoursPerYear = totalHours / yearSpan;
+                document.getElementById('hoursPerYear').value = hoursPerYear.toFixed(1);
+            } else {
+                document.getElementById('hoursPerYear').value = '';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default end year to current year
+            document.getElementById('endYear').value = new Date().getFullYear();
+            
+            // Add event listeners to auto-update when relevant fields change
+            document.getElementById('totalHours').addEventListener('input', updateHoursPerYear);
+            document.getElementById('startYear').addEventListener('input', updateHoursPerYear);
+            document.getElementById('endYear').addEventListener('input', updateHoursPerYear);
+        });
+    </script>
+</body>
+</html>
